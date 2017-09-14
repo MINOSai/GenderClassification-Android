@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.megvii.cloud.http.CommonOperate;
 import com.megvii.cloud.http.FaceSetOperate;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mTextView = (TextView) findViewById(R.id.text);
+
 //        FaceDetector detector = new FaceDetector.Builder().build(getApplicationContext());
 
         if(TextUtils.isEmpty(key) || TextUtils.isEmpty(secret)){
@@ -46,24 +49,29 @@ public class MainActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i("asdf","adsf");
                     CommonOperate commonOperate = new CommonOperate(key, secret, false);
                     FaceSetOperate FaceSet = new FaceSetOperate(key, secret, false);
                     ArrayList<String> faces = new ArrayList<>();
+                    Log.i("asdf","adsf");
                     try {
-                        //检测第一个人脸，传的是本地图片文件
                         //detect first face by local file
-                        Response response1 = commonOperate.detectByte(getBitmap(R.mipmap.ic_launcher), 0, null);
+                        Log.i("asdf","adsf");
+                        Response response1 = commonOperate.detectByte(getBitmap(R.drawable.yaswant), 0, null);
+                        Log.i("asdf","adsf");
                         String faceToken1 = getFaceToken(response1);
+                        Log.i("asdf","adsf");
                         faces.add(faceToken1);
                         sb.append("faceToken1: ");
                         sb.append(faceToken1);
+                        Log.i("asdf","adsf");
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 mTextView.setText(sb.toString());
+                                Log.i("asdf","adsf");
                             }
                         });
-                        //检测第二个人脸，传的是网络图片地址
                         //detect first face by intenal image
                         Response response2 = commonOperate.detectUrl(imageUrl, 0, null);
                         String faceToken2 = getFaceToken(response2);
@@ -77,9 +85,8 @@ public class MainActivity extends AppCompatActivity {
                                 mTextView.setText(sb.toString());
                             }
                         });
-                        //检测第三个人脸，传的是base64格式的数据
                         //detect first face by local file use base64
-                        String base64 = Base64.encodeToString(getBitmap(R.mipmap.ic_launcher), Base64.NO_WRAP);
+                        String base64 = Base64.encodeToString(getBitmap(R.drawable.yaswant), Base64.NO_WRAP);
                         Response response3 = commonOperate.detectBase64(base64, 0, null);
                         String faceToken3 = getFaceToken(response3);
                         faces.add(faceToken3);
@@ -92,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                                 mTextView.setText(sb.toString());
                             }
                         });
-                        //创建人脸库，并往里加人脸
                         //create faceSet and add face
                         String faceTokens = creatFaceTokens(faces);
                         Response faceset = FaceSet.createFaceSet(null,"test",null,faceTokens,null, 1);
@@ -120,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                        //调用搜索API，得到结果
                         //use search API to find face
                         Response res = commonOperate.searchByOuterId(null, imageUrl, null, "test", 1);
                         String result = new String(res.getContent());
@@ -138,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     } catch (Exception e) {
+                        Log.i("catch","exception");
                         e.printStackTrace();
                     }
                 }
